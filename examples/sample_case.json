@@ -1,0 +1,23 @@
+{
+  "declared": {
+    "category": "textiles",
+    "weight_kg": 1000,
+    "dimensions_cm": [
+      120,
+      100,
+      100
+    ],
+    "seal_intact": true
+  },
+  "observed": {
+    "category": "textiles",
+    "weight_kg": 1120,
+    "dimensions_cm": [
+      120,
+      100,
+      100
+    ],
+    "seal_intact": false
+  },
+  "expected_review": true
+}

@@ -1,0 +1,1 @@
+# cargo-scan-consistency-lab

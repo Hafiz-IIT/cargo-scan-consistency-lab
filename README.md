@@ -43,3 +43,10 @@ Tests verify clean matches and obvious mismatches; future experiments should add
 
 ## License
 MIT.
+
+## Extended implementation
+
+- `multimodal_fusion.py` — provenance-aware categorical fusion that avoids double-counting correlated evidence channels.
+- `synthetic_scenarios.py` — reproducible synthetic declaration/observation cases.
+- `paper/EXIM_MULTIMODAL_FRAMEWORK.md` — working manuscript scaffold with explicit hardware/regulatory non-claims.
+- `docs/SENSOR_BOUNDARIES.md` — public physical-sensing boundary.

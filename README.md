@@ -1,41 +1,45 @@
 # Cargo Scan Consistency Lab
 
-> **Compare what a shipment declares with what structured physical-side evidence observes—then escalate discrepancies.**
+> Synthetic cargo-evidence consistency lab comparing declarations with structured scanner/sensor-side observations.
 
-The historical EXIM AI vision extended verification beyond documents: declared cargo attributes should eventually be compared against scanner/sensor/weight evidence. This repository implements only the transparent consistency layer so the logic can be evaluated without pretending unavailable X-ray/RF/IR hardware exists.
+## Status
+**Reproducible prototype** with executable Python, tests, and GitHub Actions CI.
 
-## Implemented
-- declared and observed cargo records
-- category mismatch detection
-- relative weight-tolerance checks
-- dimension-tolerance checks
-- seal-state comparison
-- severity-tagged discrepancies
-- human-review trigger
+## Problem
+A shipment declaration can be internally consistent while physical evidence points elsewhere. The decision layer needs explicit discrepancy handling rather than blind trust in either source.
 
-## Structure
-- `cargo_scan_consistency_lab.py` — core
-- `tests/` — tests
-- `examples/` — reproducible example
-- `docs/architecture.md` — architecture
-- `docs/research-agenda.md` — experiments + manuscript lineage
-- `STATUS.md` — maturity/claims
-- `CITATION.cff` — citation metadata
+## Architecture
+Declared cargo record + observed cargo record → category/weight/dimension/seal comparisons → tolerance checks → discrepancy severity → human-review signal.
 
-## Run
+## Quick start
 ```bash
 python -m unittest discover -s tests -v
 python cargo_scan_consistency_lab.py
 ```
 
-## Pipeline
-**declared cargo → structured observations → tolerance checks → discrepancy list → severity → human review**
+## Implemented
+- Structured declared/observed records
+- Category mismatch detection
+- Relative weight tolerance
+- Dimension tolerances
+- Seal-state comparison
+- Severity labels
+- Human-review trigger
+- Tests and CI
 
 ## Research lineage
-Directly linked to the EXIM AI multimodal cargo-scanning concept discussed for X-ray, RF, infrared, weight, and declaration/RITC consistency. The present code deliberately stops before image/sensor interpretation.
+- *AI for Supply Chain Integrity*
+- *Ethical & Legal Dimensions of Autonomous Systems*
+- *Human-Centered AI Design for Inclusive Digital Platforms*
 
 ## Evaluation
-Stress weight/dimension/category/seal deviations at controlled magnitudes and measure detection thresholds, escalation burden, and sensitivity to noisy observations.
+Tests verify clean matches and obvious mismatches; future experiments should add sensor noise and threshold calibration.
 
-## Maturity
-**Research prototype.** No real X-ray, IR, RF, computer-vision model, customs scanner, RITC classifier, or field sensor is implemented or claimed.
+## Limitations
+- No X-ray/IR/RF interpretation model
+- No scanner hardware
+- Synthetic structured observations only
+- No customs deployment claim
+
+## License
+MIT.

@@ -1,0 +1,14 @@
+[build-system]
+requires=["setuptools>=68"]
+build-backend="setuptools.build_meta"
+
+[project]
+name="cargo-scan-consistency-lab"
+version="0.1.0"
+description="Synthetic cargo-evidence consistency lab comparing declarations with structured scanner/sensor-side observations."
+requires-python=">=3.10"
+license={text="MIT"}
+authors=[{name="Syed Hafiz Ali"}]
+
+[tool.setuptools]
+py-modules=["cargo_scan_consistency_lab"]

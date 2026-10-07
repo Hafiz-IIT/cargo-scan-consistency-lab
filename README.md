@@ -1,52 +1,49 @@
 # Cargo Scan Consistency Lab
 
-> Synthetic cargo-evidence consistency lab comparing declarations with structured scanner/sensor-side observations.
+<p align="center"><strong>Declaration vs Observation: A Synthetic Cargo-Evidence Lab</strong><br/><sub>Model discrepancies explicitly before they become operational decisions.</sub></p>
 
-## Status
-**Reproducible prototype** with executable Python, tests, and GitHub Actions CI.
+<p align="center"><a href="https://github.com/Hafiz-IIT/cargo-scan-consistency-lab/actions"><img src="https://img.shields.io/github/actions/workflow/status/Hafiz-IIT/cargo-scan-consistency-lab/ci.yml?label=CI" alt="CI"/></a> <img src="https://img.shields.io/badge/status-reproducible%20prototype-blue" alt="Prototype"/></p>
 
-## Problem
-A shipment declaration can be internally consistent while physical evidence points elsewhere. The decision layer needs explicit discrepancy handling rather than blind trust in either source.
+## Research question
 
-## Architecture
-Declared cargo record + observed cargo record → category/weight/dimension/seal comparisons → tolerance checks → discrepancy severity → human-review signal.
+**How should an AI system report disagreement between a shipment declaration and observed cargo evidence without pretending the observation source is infallible?**
 
-## Quick start
-```bash
-python -m unittest discover -s tests -v
-python cargo_scan_consistency_lab.py
+## Pipeline
+
+```
+Declared record + observed record
+              ↓
+ category / weight / dimensions / seal
+              ↓
+       tolerance checks
+              ↓
+      discrepancy severity
+              ↓
+        review signal
 ```
 
+## Try it
+
+```bash
+python cargo_scan_consistency_lab.py
+python -m unittest discover -s tests -v
+```
+
+Additional modules include provenance-aware multimodal fusion and synthetic scenarios.
+
 ## Implemented
-- Structured declared/observed records
-- Category mismatch detection
-- Relative weight tolerance
-- Dimension tolerances
-- Seal-state comparison
-- Severity labels
-- Human-review trigger
-- Tests and CI
 
-## Research lineage
-- *AI for Supply Chain Integrity*
-- *Ethical & Legal Dimensions of Autonomous Systems*
-- *Human-Centered AI Design for Inclusive Digital Platforms*
+- declared/observed structured records
+- category mismatch detection
+- weight and dimension tolerances
+- seal-state comparison
+- discrepancy severity
+- provenance-aware evidence fusion
+- synthetic scenarios
+- deterministic CI
 
-## Evaluation
-Tests verify clean matches and obvious mismatches; future experiments should add sensor noise and threshold calibration.
+## Critical boundary
 
-## Limitations
-- No X-ray/IR/RF interpretation model
-- No scanner hardware
-- Synthetic structured observations only
-- No customs deployment claim
+**This repository does not implement an X-ray, IR, RF, THz or physical cargo scanner.** It models structured observations so the decision layer can be studied independently of hardware.
 
-## License
-MIT.
-
-## Extended implementation
-
-- `multimodal_fusion.py` — provenance-aware categorical fusion that avoids double-counting correlated evidence channels.
-- `synthetic_scenarios.py` — reproducible synthetic declaration/observation cases.
-- `paper/EXIM_MULTIMODAL_FRAMEWORK.md` — working manuscript scaffold with explicit hardware/regulatory non-claims.
-- `docs/SENSOR_BOUNDARIES.md` — public physical-sensing boundary.
+Related: [EXIM Document Truth Bench](https://github.com/Hafiz-IIT/exim-document-truth-bench) · [EXIM Copilot Core](https://github.com/Hafiz-IIT/exim-copilot-core)

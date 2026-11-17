@@ -21,6 +21,13 @@ class CargoConsistencyTests(unittest.TestCase):
         self.assertTrue(review_required(discrepancies))
         self.assertEqual({x.field for x in discrepancies}, {"category", "seal_intact"})
 
+    def test_invalid_physical_measurements_and_tolerances_are_rejected(self):
+        with self.assertRaises(ValueError):
+            CargoRecord("textiles", -1, 100, 100, 100, True)
+        record = CargoRecord("textiles", 1000, 100, 100, 100, True)
+        with self.assertRaises(ValueError):
+            compare(record, record, weight_tolerance_ratio=float("nan"))
+
 
 if __name__ == "__main__":
     unittest.main()

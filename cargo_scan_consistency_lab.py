@@ -35,7 +35,7 @@ class Discrepancy:
     def __post_init__(self):
         if not isinstance(self.field, str) or not self.field.strip():
             raise ValueError("discrepancy field must be non-empty")
-        if self.severity not in {"low", "medium", "high"}:
+        if not isinstance(self.severity, str) or self.severity not in {"low", "medium", "high"}:
             raise ValueError("severity must be low, medium or high")
 
 

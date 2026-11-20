@@ -20,8 +20,12 @@ def generate_scenarios(n: int = 100, *, seed: int = 7, anomaly_rate: float = 0.2
         raise ValueError("n must be a positive integer")
     if isinstance(seed, bool) or not isinstance(seed, int):
         raise ValueError("seed must be an integer")
-    if isinstance(anomaly_rate, bool) or not isinstance(anomaly_rate, (int, float)) or not isfinite(anomaly_rate) or not 0 <= anomaly_rate <= 1:
-        raise ValueError("anomaly_rate must be between 0 and 1")
+    try:
+        anomaly_rate = float(anomaly_rate) if not isinstance(anomaly_rate, bool) else float("nan")
+    except (OverflowError, TypeError, ValueError) as exc:
+        raise ValueError("anomaly_rate must be finite and between 0 and 1") from exc
+    if not isfinite(anomaly_rate) or not 0 <= anomaly_rate <= 1:
+        raise ValueError("anomaly_rate must be finite and between 0 and 1")
 
     rng = random.Random(seed)
     rows: list[dict] = []

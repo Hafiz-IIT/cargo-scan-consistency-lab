@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import asdict
 import json
 import random
+from math import isfinite
 
 from cargo_scan_consistency_lab import CargoRecord
 
@@ -15,9 +16,11 @@ def generate_scenarios(n: int = 100, *, seed: int = 7, anomaly_rate: float = 0.2
 
     No real customs, scanner, or commercial data is used.
     """
-    if n < 1:
-        raise ValueError("n must be >= 1")
-    if not 0 <= anomaly_rate <= 1:
+    if isinstance(n, bool) or not isinstance(n, int) or n < 1:
+        raise ValueError("n must be a positive integer")
+    if isinstance(seed, bool) or not isinstance(seed, int):
+        raise ValueError("seed must be an integer")
+    if isinstance(anomaly_rate, bool) or not isinstance(anomaly_rate, (int, float)) or not isfinite(anomaly_rate) or not 0 <= anomaly_rate <= 1:
         raise ValueError("anomaly_rate must be between 0 and 1")
 
     rng = random.Random(seed)

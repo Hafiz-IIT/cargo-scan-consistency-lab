@@ -29,6 +29,19 @@ class CargoConsistencyTests(unittest.TestCase):
         with self.assertRaises(TypeError):
             compare(None, None)
 
+    def test_extreme_finite_measurements_do_not_crash_relative_comparison(self):
+        declared = CargoRecord("textiles", 1e-308, 1e-308, 1e-308, 1e-308, True)
+        observed = CargoRecord("textiles", 1e308, 1e308, 1e308, 1e308, True)
+        discrepancies = compare(declared, observed)
+        self.assertEqual({item.field for item in discrepancies}, {
+            "weight_kg", "length_cm", "width_cm", "height_cm"
+        })
+        self.assertEqual(next(x for x in discrepancies if x.field == "weight_kg").severity, "high")
+
+    def test_extremely_large_integer_measurement_is_rejected_cleanly(self):
+        with self.assertRaises(ValueError):
+            CargoRecord("textiles", 10 ** 10000, 1, 1, 1, True)
+
     def test_category_and_seal_trigger_review(self):
         d = CargoRecord("textiles", 1000, 100, 100, 100, True)
         o = CargoRecord("electronics", 1000, 100, 100, 100, False)

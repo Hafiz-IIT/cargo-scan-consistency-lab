@@ -69,15 +69,18 @@ def fuse_category_observations(
     for obs in best_by_group.values():
         scores[obs.observed_category.strip().casefold()] += obs.normalized_confidence()
 
-    total = sum(scores.values())
-    if total <= 0:
-        return FusionResult(None, 0.0, len(best_by_group), tuple(sorted(scores)), True, conflicting_groups)
-
-    predicted, raw = max(scores.items(), key=lambda kv: (kv[1], kv[0]))
-    support = raw / total
     conflicting_groups = tuple(sorted(
         group for group, categories in categories_by_group.items() if len(categories) > 1
     ))
+    total = sum(scores.values())
+    if total <= 0:
+        all_categories = set(scores)
+        for group in conflicting_groups:
+            all_categories.update(categories_by_group[group])
+        return FusionResult(None, 0.0, len(best_by_group), tuple(sorted(all_categories)), True, conflicting_groups)
+
+    predicted, raw = max(scores.items(), key=lambda kv: (kv[1], kv[0]))
+    support = raw / total
     all_categories = set(scores)
     for group in conflicting_groups:
         all_categories.update(categories_by_group[group])

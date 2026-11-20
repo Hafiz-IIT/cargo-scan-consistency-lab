@@ -89,7 +89,7 @@ def fuse_category_observations(
     requires_review = (
         len(best_by_group) < min_independent_groups
         or support < min_support
-        or bool(conflicts and support < 0.90)
+        or bool(conflicts)
         or bool(conflicting_groups)
     )
     return FusionResult(

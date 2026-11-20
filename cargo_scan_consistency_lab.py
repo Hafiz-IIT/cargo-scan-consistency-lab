@@ -4,6 +4,25 @@ from dataclasses import dataclass
 from math import isfinite
 
 
+def _finite_float(name: str, value: float) -> float:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise ValueError(f"{name} must be a finite number")
+    try:
+        normalized = float(value)
+    except (OverflowError, TypeError, ValueError) as exc:
+        raise ValueError(f"{name} must be a finite number") from exc
+    if not isfinite(normalized):
+        raise ValueError(f"{name} must be a finite number")
+    return normalized
+
+
+def _relative_ratio(difference: float, baseline: float) -> float:
+    try:
+        return difference / baseline
+    except OverflowError:
+        return float("inf")
+
+
 @dataclass(frozen=True)
 class CargoRecord:
     category: str
@@ -17,10 +36,10 @@ class CargoRecord:
         if not isinstance(self.category, str) or not self.category.strip():
             raise ValueError("category must be non-empty")
         for name in ("weight_kg", "length_cm", "width_cm", "height_cm"):
-            value = getattr(self, name)
-            if (isinstance(value, bool) or not isinstance(value, (int, float)) or
-                    not isfinite(value) or value <= 0):
+            value = _finite_float(name, getattr(self, name))
+            if value <= 0:
                 raise ValueError(f"{name} must be finite and positive")
+            object.__setattr__(self, name, value)
         if not isinstance(self.seal_intact, bool):
             raise ValueError("seal_intact must be boolean")
 
@@ -48,17 +67,19 @@ def compare(
 ) -> list[Discrepancy]:
     if not isinstance(declared, CargoRecord) or not isinstance(observed, CargoRecord):
         raise TypeError("declared and observed must be CargoRecord values")
-    for name, value in (("weight_tolerance_ratio", weight_tolerance_ratio),
-                        ("dimension_tolerance_ratio", dimension_tolerance_ratio)):
-        if (isinstance(value, bool) or not isinstance(value, (int, float)) or
-                not isfinite(value) or not 0 <= value <= 1):
-            raise ValueError(f"{name} must be finite and between 0 and 1")
+    weight_tolerance_ratio = _finite_float("weight_tolerance_ratio", weight_tolerance_ratio)
+    dimension_tolerance_ratio = _finite_float("dimension_tolerance_ratio", dimension_tolerance_ratio)
+    if not 0 <= weight_tolerance_ratio <= 1:
+        raise ValueError("weight_tolerance_ratio must be between 0 and 1")
+    if not 0 <= dimension_tolerance_ratio <= 1:
+        raise ValueError("dimension_tolerance_ratio must be between 0 and 1")
     out: list[Discrepancy] = []
 
     if declared.category.strip().casefold() != observed.category.strip().casefold():
         out.append(Discrepancy("category", declared.category, observed.category, "high"))
 
-    weight_ratio = abs(observed.weight_kg - declared.weight_kg) / declared.weight_kg
+    weight_difference = abs(observed.weight_kg - declared.weight_kg)
+    weight_ratio = _relative_ratio(weight_difference, declared.weight_kg)
     if weight_ratio > weight_tolerance_ratio:
         severity = "high" if weight_ratio > weight_tolerance_ratio * 2 else "medium"
         out.append(Discrepancy("weight_kg", declared.weight_kg, observed.weight_kg, severity))
@@ -66,7 +87,7 @@ def compare(
     for field in ("length_cm", "width_cm", "height_cm"):
         d = float(getattr(declared, field))
         o = float(getattr(observed, field))
-        ratio = abs(o - d) / d
+        ratio = _relative_ratio(abs(o - d), d)
         if ratio > dimension_tolerance_ratio:
             out.append(Discrepancy(field, d, o, "medium"))
 

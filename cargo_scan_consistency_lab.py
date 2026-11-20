@@ -50,7 +50,7 @@ def compare(
     if declared.category.strip().casefold() != observed.category.strip().casefold():
         out.append(Discrepancy("category", declared.category, observed.category, "high"))
 
-    weight_ratio = abs(observed.weight_kg - declared.weight_kg) / max(1.0, declared.weight_kg)
+    weight_ratio = abs(observed.weight_kg - declared.weight_kg) / declared.weight_kg
     if weight_ratio > weight_tolerance_ratio:
         severity = "high" if weight_ratio > weight_tolerance_ratio * 2 else "medium"
         out.append(Discrepancy("weight_kg", declared.weight_kg, observed.weight_kg, severity))
@@ -58,7 +58,7 @@ def compare(
     for field in ("length_cm", "width_cm", "height_cm"):
         d = float(getattr(declared, field))
         o = float(getattr(observed, field))
-        ratio = abs(o - d) / max(1.0, d)
+        ratio = abs(o - d) / d
         if ratio > dimension_tolerance_ratio:
             out.append(Discrepancy(field, d, o, "medium"))
 

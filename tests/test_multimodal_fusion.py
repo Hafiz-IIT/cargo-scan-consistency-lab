@@ -43,6 +43,15 @@ class MultimodalFusionTests(unittest.TestCase):
         ])
         self.assertEqual(result.conflicting_groups, ("shared",))
 
+    def test_zero_confidence_within_conflicting_group_fails_closed(self):
+        result = fuse_category_observations([
+            SensorObservation("cam-a", "textiles", 0.0, "shared"),
+            SensorObservation("cam-b", "machinery", 0.0, "shared"),
+        ])
+        self.assertTrue(result.requires_review)
+        self.assertIsNone(result.predicted_category)
+        self.assertEqual(result.conflicting_groups, ("shared",))
+
     def test_invalid_observation_collection_rejected(self):
         with self.assertRaises(ValueError):
             fuse_category_observations(None)

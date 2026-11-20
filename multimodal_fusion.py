@@ -4,6 +4,8 @@ from dataclasses import dataclass
 from collections import defaultdict
 from math import isfinite
 
+from cargo_scan_consistency_lab import _finite_float
+
 
 @dataclass(frozen=True)
 class SensorObservation:
@@ -17,9 +19,10 @@ class SensorObservation:
                             ("independent_group", self.independent_group)):
             if not isinstance(value, str) or not value.strip():
                 raise ValueError(f"{name} must be non-empty")
-        if (isinstance(self.confidence, bool) or not isinstance(self.confidence, (int, float)) or
-                not isfinite(self.confidence) or not 0.0 <= self.confidence <= 1.0):
-            raise ValueError("confidence must be finite and between 0 and 1")
+        confidence = _finite_float("confidence", self.confidence)
+        if not 0.0 <= confidence <= 1.0:
+            raise ValueError("confidence must be between 0 and 1")
+        object.__setattr__(self, "confidence", confidence)
 
     def normalized_confidence(self) -> float:
         return float(self.confidence)
@@ -49,9 +52,9 @@ def fuse_category_observations(
     """
     if isinstance(min_independent_groups, bool) or not isinstance(min_independent_groups, int) or min_independent_groups < 1:
         raise ValueError("min_independent_groups must be a positive integer")
-    if (isinstance(min_support, bool) or not isinstance(min_support, (int, float)) or
-            not isfinite(min_support) or not 0.0 <= min_support <= 1.0):
-        raise ValueError("min_support must be finite and between 0 and 1")
+    min_support = _finite_float("min_support", min_support)
+    if not 0.0 <= min_support <= 1.0:
+        raise ValueError("min_support must be between 0 and 1")
     if not isinstance(observations, list) or any(not isinstance(obs, SensorObservation) for obs in observations):
         raise ValueError("observations must be a list of SensorObservation values")
     if not observations:

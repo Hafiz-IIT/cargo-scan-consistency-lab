@@ -70,6 +70,15 @@ class MultimodalFusionTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             fuse_category_observations([], min_support=1.1)
 
+    def test_extreme_numeric_confidence_and_support_threshold_fail_cleanly(self):
+        huge = 10 ** 10000
+        with self.assertRaises(ValueError):
+            SensorObservation("camera", "textiles", huge, "vision")
+        with self.assertRaises(ValueError):
+            fuse_category_observations([], min_support=huge)
+        with self.assertRaises(ValueError):
+            generate_scenarios(10, anomaly_rate=huge)
+
     def test_conflict_requires_review(self):
         result = fuse_category_observations([
             SensorObservation("physical", "textiles", 0.80, "physical"),

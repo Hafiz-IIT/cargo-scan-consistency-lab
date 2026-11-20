@@ -32,6 +32,7 @@ class FusionResult:
     independent_groups: int
     conflicting_categories: tuple[str, ...]
     requires_review: bool
+    conflicting_groups: tuple[str, ...] = ()
 
 
 def fuse_category_observations(
@@ -51,8 +52,10 @@ def fuse_category_observations(
     if (isinstance(min_support, bool) or not isinstance(min_support, (int, float)) or
             not isfinite(min_support) or not 0.0 <= min_support <= 1.0):
         raise ValueError("min_support must be finite and between 0 and 1")
+    if not isinstance(observations, list) or any(not isinstance(obs, SensorObservation) for obs in observations):
+        raise ValueError("observations must be a list of SensorObservation values")
     if not observations:
-        return FusionResult(None, 0.0, 0, (), True)
+        return FusionResult(None, 0.0, 0, (), True, ())
 
     best_by_group: dict[str, SensorObservation] = {}
     categories_by_group: dict[str, set[str]] = defaultdict(set)
@@ -64,11 +67,11 @@ def fuse_category_observations(
 
     scores: dict[str, float] = defaultdict(float)
     for obs in best_by_group.values():
-        scores[obs.observed_category.strip().lower()] += obs.normalized_confidence()
+        scores[obs.observed_category.strip().casefold()] += obs.normalized_confidence()
 
     total = sum(scores.values())
     if total <= 0:
-        return FusionResult(None, 0.0, len(best_by_group), tuple(sorted(scores)), True)
+        return FusionResult(None, 0.0, len(best_by_group), tuple(sorted(scores)), True, conflicting_groups)
 
     predicted, raw = max(scores.items(), key=lambda kv: (kv[1], kv[0]))
     support = raw / total
@@ -92,6 +95,7 @@ def fuse_category_observations(
         independent_groups=len(best_by_group),
         conflicting_categories=conflicts,
         requires_review=requires_review,
+        conflicting_groups=conflicting_groups,
     )
 
 
@@ -99,9 +103,13 @@ def declaration_consistent(
     declared_category: str,
     fusion: FusionResult,
 ) -> bool:
+    if not isinstance(declared_category, str) or not declared_category.strip():
+        raise ValueError("declared_category must be a non-empty string")
+    if not isinstance(fusion, FusionResult):
+        raise TypeError("fusion must be a FusionResult")
     return (
         fusion.predicted_category is not None
-        and fusion.predicted_category == declared_category.strip().lower()
+        and fusion.predicted_category == declared_category.strip().casefold()
         and not fusion.requires_review
     )
 

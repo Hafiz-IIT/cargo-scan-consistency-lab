@@ -26,6 +26,21 @@ class MultimodalFusionTests(unittest.TestCase):
         self.assertEqual(result.independent_groups, 1)
         self.assertTrue(result.requires_review)
 
+    def test_conflict_within_correlated_group_requires_review(self):
+        result = fuse_category_observations([
+            SensorObservation("camera-a", "textiles", 0.95, "shared-vision"),
+            SensorObservation("camera-b", "machinery", 0.80, "shared-vision"),
+            SensorObservation("weight", "textiles", 0.90, "physical"),
+        ])
+        self.assertTrue(result.requires_review)
+        self.assertEqual(set(result.conflicting_categories), {"machinery", "textiles"})
+
+    def test_invalid_confidence_and_threshold_are_rejected(self):
+        with self.assertRaises(ValueError):
+            SensorObservation("camera", "textiles", 1.2, "vision")
+        with self.assertRaises(ValueError):
+            fuse_category_observations([], min_support=1.1)
+
     def test_conflict_requires_review(self):
         result = fuse_category_observations([
             SensorObservation("physical", "textiles", 0.80, "physical"),

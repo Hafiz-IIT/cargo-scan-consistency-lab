@@ -32,6 +32,12 @@ class Discrepancy:
     observed: object
     severity: str
 
+    def __post_init__(self):
+        if not isinstance(self.field, str) or not self.field.strip():
+            raise ValueError("discrepancy field must be non-empty")
+        if self.severity not in {"low", "medium", "high"}:
+            raise ValueError("severity must be low, medium or high")
+
 
 def compare(
     declared: CargoRecord,
@@ -40,6 +46,8 @@ def compare(
     weight_tolerance_ratio: float = 0.05,
     dimension_tolerance_ratio: float = 0.10,
 ) -> list[Discrepancy]:
+    if not isinstance(declared, CargoRecord) or not isinstance(observed, CargoRecord):
+        raise TypeError("declared and observed must be CargoRecord values")
     for name, value in (("weight_tolerance_ratio", weight_tolerance_ratio),
                         ("dimension_tolerance_ratio", dimension_tolerance_ratio)):
         if (isinstance(value, bool) or not isinstance(value, (int, float)) or
@@ -69,6 +77,8 @@ def compare(
 
 
 def review_required(discrepancies: list[Discrepancy]) -> bool:
+    if not isinstance(discrepancies, list) or any(not isinstance(item, Discrepancy) for item in discrepancies):
+        raise ValueError("discrepancies must be a list of Discrepancy values")
     return bool(discrepancies)
 
 

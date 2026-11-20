@@ -25,6 +25,10 @@ class CargoConsistencyTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             compare(record, record, weight_tolerance_ratio=-0.1)
 
+    def test_invalid_record_types_rejected(self):
+        with self.assertRaises(TypeError):
+            compare(None, None)
+
     def test_category_and_seal_trigger_review(self):
         d = CargoRecord("textiles", 1000, 100, 100, 100, True)
         o = CargoRecord("electronics", 1000, 100, 100, 100, False)

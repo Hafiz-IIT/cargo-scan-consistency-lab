@@ -61,6 +61,14 @@ class MultimodalFusionTests(unittest.TestCase):
         self.assertTrue(result.requires_review)
         self.assertEqual(set(result.conflicting_categories), {"machinery", "textiles"})
 
+    def test_scenario_generator_rejects_invalid_parameters(self):
+        with self.assertRaises(ValueError):
+            generate_scenarios(True)
+        with self.assertRaises(ValueError):
+            generate_scenarios(10, anomaly_rate=float("nan"))
+        with self.assertRaises(ValueError):
+            generate_scenarios(10, seed=True)
+
     def test_synthetic_scenarios_reproducible(self):
         a = generate_scenarios(10, seed=42)
         b = generate_scenarios(10, seed=42)
